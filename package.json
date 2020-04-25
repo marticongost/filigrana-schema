@@ -1,0 +1,28 @@
+{
+  "name": "@filigrana/schema",
+  "version": "0.0.1",
+  "description": "Schema definition for Filigrana, a schema driven, React based UI toolkit",
+  "main": "src/index.js",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marticongost/filigrana-schema.git"
+  },
+  "keywords": [
+    "schema",
+    "model",
+    "declarative"
+  ],
+  "author": "Martí Congost",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/marticongost/filigrana-schema/issues"
+  },
+  "homepage": "https://github.com/marticongost/filigrana-schema#readme",
+  "dependencies": {
+    "@filigrana/enum": "^1.0.0"
+  },
+  "devDependencies": {
+  }
+}
