@@ -126,8 +126,23 @@ export class RESTObjectStore extends ObjectStore {
         return {};
     }
 
+    fetchURL(options) {
+
+        let urlOptions = options;
+        let fetchOptions = this.fetchOptions;
+
+        if (options) {
+            let {method, ...urlOptions} = options;
+            if (method) {
+                fetchOptions.method = method;
+            }
+        }
+
+        return fetch(this.getURL(urlOptions), fetchOptions)
+    }
+
     async *[Symbol.asyncIterator]() {
-        const response = await fetch(this.getURL(), this.fetchOptions);
+        const response = await this.fetchURL();
         const json = await response.json();
         for (let record of json) {
             yield this.objectFromJSON(record);
