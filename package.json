@@ -1,10 +1,9 @@
 {
   "name": "@filigrana/schema",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Schema definition for Filigrana, a schema driven, React based UI toolkit",
   "main": "src/index.js",
-  "scripts": {
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/marticongost/filigrana-schema.git"
@@ -23,6 +22,5 @@
   "dependencies": {
     "@filigrana/enum": "^1.0.0"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }
