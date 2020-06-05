@@ -22,4 +22,26 @@ export class Enum extends Field {
     get enum() {
         return this[ENUM];
     }
+
+    getCopyParameters(options = null) {
+        return Object.assign(
+            super.getCopyParameters(options),
+            {enum: this[ENUM]}
+        );
+    }
+
+    getValueLabel(value, options = null) {
+        if (value && value.label) {
+            return value.label;
+        }
+        return super.getValueLabel(value, options);
+    }
+
+    fromJSON(value) {
+        return this[ENUM].getEntryByValue(value);
+    }
+
+    toJSON(value) {
+        return value.toString();
+    }
 }
