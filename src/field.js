@@ -166,6 +166,22 @@ export class Field {
         return parameters;
     }
 
+     // === JSON import/export ================================================
+
+    /**
+     * Turns a JSON value into a valid value for the field.
+     */
+    fromJSON(value) {
+        return value;
+    }
+
+    /**
+     * Obtains the JSON representation for one of the field's values.
+     */
+    toJSON(value) {
+        return value;
+    }
+
     // === User readable texts ================================================
 
     /**
