@@ -91,9 +91,13 @@ export class RESTObjectStore extends ObjectStore {
         return this[ROOT_STORE][BASE_PATH];
     }
 
-    getURL() {
+    getURL(options = null) {
 
         let url = this.basePath;
+
+        if (options && options.path) {
+            url += options.path;
+        }
 
         let qs = [];
         for (let key in this[PARAMETERS]) {
