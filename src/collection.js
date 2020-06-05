@@ -1,4 +1,4 @@
-import { Field, ValidationError } from './field.js';
+import { Field, FieldRole, ValidationError } from './field.js';
 import { getParameter } from './utils.js';
 
 const ITEMS = Symbol('ITEMS');
@@ -17,6 +17,10 @@ export class Collection extends Field {
         );
         this[MIN_ITEMS] = getParameter(parameters, 'minItems');
         this[MAX_ITEMS] = getParameter(parameters, 'maxItems');
+
+        if (this[ITEMS]) {
+            this.claim(this[ITEMS], FieldRole.COLLECTION_ITEMS);
+        }
     }
 
     getCopyParameters(options = null) {
