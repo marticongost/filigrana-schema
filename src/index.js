@@ -21,3 +21,4 @@ export { Float } from "./numbers";
 export { Enum } from "./enum";
 export { Reference } from "./reference";
 export { Collection } from "./collection";
+export { Mapping } from "./mapping";
