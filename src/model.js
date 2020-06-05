@@ -83,6 +83,20 @@ export class Model {
         return this[SCHEMA];
     }
 
+    getValueLabel(key) {
+        const field = this.constructor[key];
+        if (!field) {
+            if (typeof(field) != 'string') {
+                throw new Error(
+                    `Model.getValue() expected a string key, `
+                    + `got "${typeof(field)}" instead`
+                );
+            }
+            throw new UnknownFieldError(this, key, 'get the label for');
+        }
+        return field.getValueLabel(this[PROPERTIES][key]);
+    }
+
     getValue(key) {
 
         const field = this.constructor[key];
@@ -131,7 +145,7 @@ export class Model {
     static fromJSON(record) {
         const properties = {};
         for (let field of this.schema.fields()) {
-            properties[field.name] = record[field.name];
+            properties[field.name] = field.fromJSON(record[field.name]);
         }
         return new this(properties);
     }
@@ -139,7 +153,7 @@ export class Model {
     toJSON() {
         const data = {};
         for (let field of this[SCHEMA].fields) {
-            data[field.name] = field.toJSON(this[field.name]);
+            data[field.name] = field.toJSON(this.getValue(name));
         }
         return data;
     }

@@ -200,6 +200,19 @@ export class Field {
         return this[DESCRIPTION];
     }
 
+    /**
+     * Obtains a descriptive representation of one of the field's values.
+     *
+     * The returned value should be a string suitable for inclusion in
+     * controls, listings and, in general, user facing elements.
+     */
+    getValueLabel(value, options = null) {
+        if (value === null || value === undefined) {
+            return '';
+        }
+        return value.toString();
+    }
+
     // === Constraints ========================================================
 
     /**
