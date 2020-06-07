@@ -1,3 +1,4 @@
+import { prepareSearch } from "./search";
 
 const ROOT_STORE = Symbol('ROOT_STORE');
 const PARAMETERS = Symbol('PARAMETERS');
@@ -5,8 +6,17 @@ const MODEL = Symbol('MODEL');
 
 export class ObjectStore {
 
-    constructor(parent = null, parameters = null) {
+    constructor(options = null) {
+
+        const parent = options && options.parent;
+        const parameters = options && options.parameters;
+
         this[ROOT_STORE] = parent ? parent[ROOT_STORE] : this;
+
+        if (parent) {
+            this[MODEL] = parent[MODEL];
+        }
+
         this[PARAMETERS] = Object.freeze(
             Object.assign({}, parent && parent[PARAMETERS], parameters)
         );
@@ -34,8 +44,8 @@ export class ObjectStore {
         return this[PARAMETERS];
     }
 
-    select(parameters) {
-        return new this.constructor(this, parameters);
+    select(options) {
+        return new this.constructor({parent: this, ...options});
     }
 
     [Symbol.asyncIterator]() {
@@ -52,25 +62,36 @@ export class ObjectStore {
         return list;
     }
 
-    async get(parameters) {
-        const results = await this.select(parameters).results();
-        if (!results.length) {
-            throw new NotFoundError(this, parameters);
+    async get(options) {
+        let object = null;
+
+        for await (let result of this.select(options)) {
+            if (object) {
+                throw new MultipleResultsError(this, options);
+            }
+            object = result;
         }
-        if (results.length > 1) {
-            throw new MultipleResultsError(this, parameters, results.count);
+
+        if (!object) {
+            throw new NotFoundError(this, options);
         }
-        return results[0];
+
+        return object;
     }
 
     async count() {
-        const results = await this.results();
-        return results.length;
+        let n = 0;
+        for await (let result of this) {
+            n++;
+        }
+        return n;
     }
 
     async exists() {
-        const results = await this.results();
-        return results.length > 0;
+        for await (let result of this) {
+            return true;
+        }
+        return false;
     }
 }
 
@@ -78,9 +99,17 @@ const BASE_PATH = Symbol('BASE_PATH');
 
 export class RESTObjectStore extends ObjectStore {
 
-    constructor(basePath, parent = null, parameters = null) {
-        super(parent, parameters);
-        this[BASE_PATH] = basePath;
+    constructor(options = null) {
+        super(options);
+        this[BASE_PATH] = options && options.basePath;
+        if (!this[BASE_PATH]) {
+            if (options && options.parent) {
+                this[BASE_PATH] = options.parent[BASE_PATH];
+            }
+            if (!this[BASE_PATH]) {
+                throw new ObjectStoreConfigurationError(this);
+            }
+        }
     }
 
     get model() {
@@ -164,6 +193,13 @@ export class ObjectStoreError extends Error {
     }
 }
 
+export class ObjectStoreConfigurationError extends ObjectStoreError {
+
+    constructor(store) {
+        super(store, 'Invalid configuration');
+    }
+}
+
 export class NotFoundError extends ObjectStoreError {
 
     constructor(store) {
@@ -171,19 +207,12 @@ export class NotFoundError extends ObjectStoreError {
     }
 }
 
-const COUNT = Symbol('COUNT');
-
 export class MultipleResultsError extends ObjectStoreError {
 
-    constructor(store, parameters, count) {
+    constructor(store, parameters) {
         super(
             store,
-            `Found ${count} results when looking for object ${store}`
+            `Found multiple results when looking for object ${store}`
         );
-        this[COUNT] = count;
-    }
-
-    get count() {
-        return this[COUNT];
     }
 }
