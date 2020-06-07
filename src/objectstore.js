@@ -1,5 +1,3 @@
-import { prepareSearch } from "./search";
-
 const ROOT_STORE = Symbol('ROOT_STORE');
 const PARAMETERS = Symbol('PARAMETERS');
 const MODEL = Symbol('MODEL');
@@ -167,7 +165,15 @@ export class RESTObjectStore extends ObjectStore {
             }
         }
 
-        return fetch(this.getURL(urlOptions), fetchOptions)
+        return (
+            fetch(this.getURL(urlOptions), fetchOptions)
+            .then(response => {
+                if (!response.ok) {
+                    throw new ObjectStoreRequestError(response);
+                }
+                return response;
+            })
+        );
     }
 
     async *[Symbol.asyncIterator]() {
@@ -197,6 +203,20 @@ export class ObjectStoreConfigurationError extends ObjectStoreError {
 
     constructor(store) {
         super(store, 'Invalid configuration');
+    }
+}
+
+const RESPONSE = Symbol('RESPONSE');
+
+export class ObjectStoreRequestError extends ObjectStore {
+
+    constructor(store, response) {
+        super(store, 'Error while processing request');
+        this[RESPONSE] = response;
+    }
+
+    get response() {
+        return this[RESPONSE];
     }
 }
 
