@@ -10,6 +10,7 @@ const DESCRIPTION = Symbol('DESCRIPTION');
 const TYPE = Symbol('TYPE');
 const REQUIRED = Symbol('REQUIRED');
 const DEFAULT_VALUE = Symbol('DEFAULT_VALUE');
+const SEARCHABLE = Symbol('SEARCHABLE');
 
 export class Field {
 
@@ -21,6 +22,7 @@ export class Field {
             type,
             required,
             defaultValue,
+            searchable,
             ...customKeys
         } = parameters || {};
 
@@ -46,6 +48,10 @@ export class Field {
 
         if (defaultValue !== undefined) {
             this[DEFAULT_VALUE] = defaultValue;
+        }
+
+        if (searchable !== undefined) {
+            this[SEARCHABLE] = searchable;
         }
 
         for (let hint in Object.getOwnPropertyNames(customKeys)) {
@@ -296,6 +302,47 @@ export class Field {
      */
     normalize(value) {
         return value;
+    }
+
+    // === Text search ========================================================
+
+    /**
+     * Determines if the field type should be included in text searches by
+     * default.
+     *
+     * Field instances can override this through their {@link Field#searchable}
+     * property.
+     *
+     * @type {bool}
+     */
+    static get searchable() {
+        return false;
+    }
+
+    /**
+     * Determines if the field should contribute to the searchable text of the
+     * object it belongs to.
+     *
+     * If not set it defaults to the {@link Field.searchable} property.
+     *
+     * @type {bool}
+     */
+    get searchable() {
+        if (this[SEARCHABLE] === undefined) {
+            return this.constructor.searchable;
+        }
+        return this[SEARCHABLE];
+    }
+
+    /**
+     * Extracts searchable text from the provided value.
+     *
+     * @param {String} value - The value to obtain the text for.
+     * @returns {String} - A string containing the searchable text for the
+     * given value.
+     */
+    getSearchableText(value) {
+        return value.toString();
     }
 }
 

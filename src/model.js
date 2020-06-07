@@ -157,6 +157,23 @@ export class Model {
         }
         return data;
     }
+
+    /**
+     * Obtains the searchable text for the object.
+     *
+     * @returns {String} - A string containing all the searchable text for the
+     * object.
+     */
+    getSearchableText() {
+        const chunks = [];
+        for (let field of this.constructor[SCHEMA].fields()) {
+            if (field.searchable) {
+                let value = this.getValue(field.name);
+                chunks.push(field.getSearchableText(value));
+            }
+        }
+        return chunks.join(' ');
+    }
 }
 
 const INSTANCE = Symbol('INSTANCE');
