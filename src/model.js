@@ -110,7 +110,7 @@ export class Model {
             throw new UnknownFieldError(this, key, 'get');
         }
 
-        const value = this[PROPERTIES][key];
+        let value = this[PROPERTIES][key];
 
         if (value === undefined) {
             value = field.produceDefaultValue(this);
