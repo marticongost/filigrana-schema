@@ -70,7 +70,11 @@ export class Schema extends Field {
             for (let spec of fields) {
                 let field;
                 if (typeof(spec) == 'string') {
-                    field = produceField(this[FIELDS][spec]);
+                    const sourceField = this[FIELDS][spec];
+                    if (!sourceField) {
+                        throw new MemberNotFoundError(this, spec);
+                    }
+                    field = produceField(sourceField);
                 }
                 else if (spec instanceof Field) {
                     field = produceField(spec);
@@ -149,5 +153,14 @@ class AnonymousMemberError extends Error {
         super(`Can't add anonymous field ${field} to ${schema}`);
         this.field = field;
         this.schema = schema;
+    }
+}
+
+class MemberNotFoundError extends Error {
+
+    constructor(schema, fieldName) {
+        super(`${schema} doesn't contain a member named ${fieldName}`);
+        this.schema = schema;
+        this.fieldName = fieldName;
     }
 }
