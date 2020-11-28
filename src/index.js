@@ -16,8 +16,7 @@ export {
 export { Schema } from "./schema";
 export { Text } from "./text";
 export { Boolean } from "./boolean";
-export { Integer } from "./numbers";
-export { Float } from "./numbers";
+export { Integer, Float, NUMBER_FORMATTER } from "./numbers";
 export { Enum } from "./enum";
 export { Reference } from "./reference";
 export { Collection } from "./collection";
