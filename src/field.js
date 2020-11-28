@@ -343,6 +343,9 @@ export class Field {
      * given value.
      */
     getSearchableText(value) {
+        if (value === null || value === undefined) {
+            return "";
+        }
         return value.toString();
     }
 
