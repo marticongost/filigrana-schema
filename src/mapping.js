@@ -1,5 +1,4 @@
 import { Field, FieldRole } from './field.js';
-import { getParameter } from './utils.js';
 
 const KEYS = Symbol('KEYS');
 const VALUES = Symbol('VALUES');
@@ -8,9 +7,10 @@ const VALUES = Symbol('VALUES');
 export class Mapping extends Field {
 
     constructor(parameters = null) {
-        super(parameters);
-        this[KEYS] = getParameter(parameters, 'keys');
-        this[VALUES] = getParameter(parameters, 'values');
+        const {keys, values, ...baseParameters} = parameters;
+        super(baseParameters);
+        this[KEYS] = keys;
+        this[VALUES] = values;
 
         if (this[KEYS]) {
             this.claim(this[KEYS], FieldRole.MAP_KEY);
@@ -23,7 +23,7 @@ export class Mapping extends Field {
 
     getCopyParameters(options = null) {
 
-        const {
+        let {
             keys,
             values,
             keysParameters,

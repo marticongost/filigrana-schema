@@ -13,6 +13,7 @@ export {
     ValueRequiredError,
     FieldOwnershipError
 } from "./field";
+export { declareHint, applyHint, isHint, UnknownHintError } from "./hints";
 export { Schema } from "./schema";
 export { Text } from "./text";
 export { Boolean } from "./boolean";

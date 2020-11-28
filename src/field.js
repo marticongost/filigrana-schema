@@ -16,47 +16,39 @@ const TYPE_NAMES = Symbol('TYPE_NAMES');
 export class Field {
 
     constructor(parameters = null) {
-        const {
-            name,
-            label,
-            description,
-            type,
-            required,
-            defaultValue,
-            searchable,
-            ...customKeys
-        } = parameters || {};
 
-        if (name !== undefined) {
-            this[NAME] = name;
-        }
+        if (parameters) {
+            if (parameters.name !== undefined) {
+                this[NAME] = parameters.name;
+            }
 
-        if (label !== undefined) {
-            this[LABEL] = label;
-        }
+            if (parameters.label !== undefined) {
+                this[LABEL] = parameters.label;
+            }
 
-        if (description !== undefined) {
-            this[DESCRIPTION] = description;
-        }
+            if (parameters.description !== undefined) {
+                this[DESCRIPTION] = parameters.description;
+            }
 
-        if (type !== undefined) {
-            this[TYPE] = type;
-        }
+            if (parameters.type !== undefined) {
+                this[TYPE] = parameters.type;
+            }
 
-        if (required !== undefined) {
-            this[REQUIRED] = required;
-        }
+            if (parameters.required !== undefined) {
+                this[REQUIRED] = parameters.required;
+            }
 
-        if (defaultValue !== undefined) {
-            this[DEFAULT_VALUE] = defaultValue;
-        }
+            if (parameters.defaultValue !== undefined) {
+                this[DEFAULT_VALUE] = parameters.defaultValue;
+            }
 
-        if (searchable !== undefined) {
-            this[SEARCHABLE] = searchable;
-        }
+            if (parameters.searchable !== undefined) {
+                this[SEARCHABLE] = parameters.searchable;
+            }
 
-        for (let hint in Object.getOwnPropertyNames(customKeys)) {
-            applyHint(this, hint, customKeys[hint]);
+            for (let hint of Object.getOwnPropertySymbols(parameters)) {
+                applyHint(this, hint, parameters[hint]);
+            }
         }
     }
 
@@ -158,7 +150,7 @@ export class Field {
             required: this[REQUIRED]
         };
 
-        for (let key of Object.getOwnPropertyNames(this)) {
+        for (let key of Object.getOwnPropertySymbols(this)) {
             if (isHint(key)) {
                 parameters[key] = this[key];
             }

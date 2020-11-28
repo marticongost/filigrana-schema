@@ -8,8 +8,9 @@ const FIELDS = Symbol('FIELDS');
 export class Schema extends Field {
 
     constructor(parameters = null) {
-        const {fields, ...baseParameters} = parameters;
+        const {base, fields, ...baseParameters} = parameters;
         super(baseParameters);
+        this[BASE] = base;
         this[FIELDS] = [];
         if (fields) {
             for (let field of fields) {
@@ -37,7 +38,7 @@ export class Schema extends Field {
             allFieldsParameters,
             perFieldParameters,
             ...baseOptions
-        } = options;
+        } = (options || {});
 
         const parameters = super.getCopyParameters(baseOptions);
 

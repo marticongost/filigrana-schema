@@ -1,6 +1,5 @@
 
 import { Field } from "./field";
-import { getParameter } from './utils.js';
 
 const FORMATTER = Symbol('FORMATTER');
 
@@ -9,8 +8,9 @@ export const NUMBER_FORMATTER = new Intl.NumberFormat(navigator.language, {});
 class Number extends Field {
 
     constructor(parameters = null) {
-        super(parameters);
-        this[FORMATTER] = getParameter(parameters, 'formatter');
+        const {formatter, ...baseParameters} = parameters;
+        super(baseParameters);
+        this[FORMATTER] = formatter;
         if (!this[FORMATTER]) {
             this[FORMATTER] = NUMBER_FORMATTER;
         }

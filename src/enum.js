@@ -10,8 +10,11 @@ const ENUM = Symbol('ENUM');
 export class Enum extends Field {
 
     constructor(parameters) {
-        super(parameters);
-        this[ENUM] = parameters.enum;
+        const enumeration = parameters.enum;
+        const {...baseParameters} = parameters;
+        delete baseParameters.enum;
+        super(baseParameters);
+        this[ENUM] = enumeration;
     }
 
     /**
