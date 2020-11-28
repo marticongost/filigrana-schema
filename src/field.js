@@ -452,3 +452,12 @@ export class ValueRequiredError extends ValidationError {
         super(validation, 'a value is required');
     }
 }
+
+export class ParseError extends Error  {
+
+    constructor(field, value) {
+        super(`${value} is not a valid value for ${field}`);
+        this.field = field;
+        this.value = value;
+    }
+}

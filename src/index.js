@@ -11,7 +11,8 @@ export {
     FieldRole,
     ValidationError,
     ValueRequiredError,
-    FieldOwnershipError
+    FieldOwnershipError,
+    ParseError
 } from "./field";
 export { declareHint, applyHint, isHint, UnknownHintError } from "./hints";
 export { Schema } from "./schema";
