@@ -11,6 +11,7 @@ const TYPE = Symbol('TYPE');
 const REQUIRED = Symbol('REQUIRED');
 const DEFAULT_VALUE = Symbol('DEFAULT_VALUE');
 const SEARCHABLE = Symbol('SEARCHABLE');
+const TYPE_NAMES = Symbol('TYPE_NAMES');
 
 export class Field {
 
@@ -343,6 +344,33 @@ export class Field {
      */
     getSearchableText(value) {
         return value.toString();
+    }
+
+    /**
+     * Obtains a string containing a space separated list of type names for the field
+     * type.
+     *
+     * This is useful when producing schema driven UIs; the HTML produced by a control
+     * or display associated with a field can be annotated with this value in order to
+     * make it simple to style or select UI elements by their field types.
+     *
+     * The value contains entries for the type itself and all base types, from more
+     * general to more specific.
+     *
+     * For example, a "Table" component could add a "data-type" HTML attribute to its
+     * headings and cells, making it trivial to align all numeric columns to the right.
+     */
+    static get typeNames() {
+        if (!this.hasOwnProperty(TYPE_NAMES)) {
+            let nameList = [];
+            let fieldClass = this;
+            while (fieldClass !== Object && fieldClass !== Field && fieldClass.name) {
+                nameList.unshift(fieldClass.name);
+                fieldClass = fieldClass.__proto__;
+            }
+            this[TYPE_NAMES] = nameList.join(' ');
+        }
+        return this[TYPE_NAMES];
     }
 }
 
