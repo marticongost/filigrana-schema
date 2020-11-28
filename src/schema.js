@@ -145,6 +145,25 @@ export class Schema extends Field {
             return this[FIELDS].length > 0;
         }
     }
+
+    /**
+     * Obtains a field, given its name.
+     *
+     * If no such field exists the method returns null.
+     *
+     * @param {String} name - The name of the field to obtain.
+     */
+    getField(name) {
+        let schema = this;
+        while (schema) {
+            const field = schema[FIELDS][name];
+            if (field) {
+                return field;
+            }
+            schema = schema[BASE];
+        }
+        return null;
+    }
 }
 
 class AnonymousMemberError extends Error {
