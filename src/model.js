@@ -66,16 +66,15 @@ export class Model {
         });
     }
 
-    static defineFields(...fields) {
+    static defineSchema(parameters) {
+        parameters.name = this.name;
+        parameters.base = this[SCHEMA];
+        this[SCHEMA] = new Schema(parameters);
 
-        this[SCHEMA] = new Schema({
-            name: this.name,
-            base: this[SCHEMA],
-            fields
-        });
-
-        for (let field of fields) {
-            this.defineField(field);
+        if (parameters.fields) {
+            for (let field of parameters.fields) {
+                this.defineField(field);
+            }
         }
     }
 
