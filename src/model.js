@@ -144,7 +144,8 @@ export class Model {
     static fromJSON(record) {
         const properties = {};
         for (let field of this.schema.fields()) {
-            properties[field.name] = field.fromJSON(record[field.name]);
+            const rawValue = field.getValueFromRecord(record);
+            properties[field.name] = field.fromJSON(rawValue);
         }
         return new this(properties);
     }

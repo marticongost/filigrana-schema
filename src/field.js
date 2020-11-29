@@ -11,6 +11,7 @@ const DESCRIPTION = Symbol('DESCRIPTION');
 const TYPE = Symbol('TYPE');
 const REQUIRED = Symbol('REQUIRED');
 const DEFAULT_VALUE = Symbol('DEFAULT_VALUE');
+const DATA_PATH = Symbol('DATA_PATH');
 const SEARCHABLE = Symbol('SEARCHABLE');
 const TYPE_NAMES = Symbol('TYPE_NAMES');
 
@@ -41,6 +42,13 @@ export class Field {
 
             if (parameters.defaultValue !== undefined) {
                 this[DEFAULT_VALUE] = parameters.defaultValue;
+            }
+
+            if (parameters.dataPath !== undefined) {
+                this[DATA_PATH] = (
+                    typeof(parameters.dataPath) == "string" ?
+                    parameters.dataPath.split(".") : parameters.dataPath
+                );
             }
 
             if (parameters.searchable !== undefined) {
@@ -180,7 +188,8 @@ export class Field {
             label: this[LABEL],
             description: this[DESCRIPTION],
             type: this[TYPE],
-            required: this[REQUIRED]
+            required: this[REQUIRED],
+            dataPath: this[DATA_PATH]
         };
 
         // Group
@@ -255,7 +264,7 @@ export class Field {
         return value.toString();
     }
 
-    // === Constraints ========================================================
+    // === Values and constraints =============================================
 
     /**
      * The type that values of the field are expected to have.
@@ -338,6 +347,46 @@ export class Field {
      */
     normalize(value) {
         return value;
+    }
+
+    /**
+     * An array indicating a custom path to retrieve the values of the field.
+     *
+     * By default, fields assume a flat key/value mapping, where their value is found
+     * at the root level of an object, mapped to a key with their same name. But in some
+     * cases, objects will arrange their values into nested object structures instead.
+     * In order to access the field value in those cases, this property should be set
+     * to a qualified dotted name, indicating the location of the field's value within
+     * the object tree (f. eg. "sales.delta.absolute", "sales.delta.percentage").
+     *
+     * The value is split into an array of attributes by the constructor.
+     *
+     * When left blank, the simple flat key/value convention is assumed.
+     */
+    get dataPath() {
+        return this[DATA_PATH];
+    }
+
+    /**
+     * Obtains the value for the field from the given record.
+     *
+     * By default retrieves the value of the key matching the field's name. If the field
+     * defines a {@link data_path}, it uses it to traverse a nested object structure.
+     *
+     * @param {object} record
+     */
+    getValueFromRecord(record) {
+        if (this[DATA_PATH]) {
+            let value = record;
+            for (let attrName of this[DATA_PATH]) {
+                value = value[attrName];
+                if (value === null || value === undefined) {
+                    break;
+                }
+            }
+            return value;
+        }
+        return record[this[NAME]];
     }
 
     // === Text search ========================================================
