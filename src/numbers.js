@@ -1,5 +1,5 @@
 
-import { Field } from "./field";
+import { Field, ParseError } from "./field";
 
 const FORMAT = Symbol('format');
 
@@ -44,7 +44,49 @@ class Number extends Field {
 }
 
 export class Integer extends Number {
+
+    fromJSON(value) {
+
+        if (value === null || value === undefined) {
+            return null;
+        }
+
+        if (typeof(value) == "number") {
+            return value;
+        }
+
+        if (typeof(value) == "string") {
+            const parsedValue = parseInt(value);
+            if (isNaN(parsedValue)) {
+                throw new ParseError(this, value);
+            }
+            return parsedValue;
+        }
+
+        throw new ParseError(this, value);
+    }
 }
 
 export class Float extends Number {
+
+    fromJSON(value) {
+
+        if (value === null || value === undefined) {
+            return null;
+        }
+
+        if (typeof(value) == "number") {
+            return value;
+        }
+
+        if (typeof(value) == "string") {
+            const parsedValue = parseFloat(value);
+            if (isNaN(parsedValue)) {
+                throw new ParseError(this, value);
+            }
+            return parsedValue;
+        }
+
+        throw new ParseError(this, value);
+    }
 }
