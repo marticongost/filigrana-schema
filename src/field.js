@@ -5,6 +5,7 @@ import { isHint, applyHint } from './hints';
 const NAME = Symbol('NAME');
 const OWNER = Symbol('OWNER');
 const ROLE = Symbol('ROLE');
+const GROUP = Symbol('GROUP');
 const LABEL = Symbol('LABEL');
 const DESCRIPTION = Symbol('DESCRIPTION');
 const TYPE = Symbol('TYPE');
@@ -44,6 +45,10 @@ export class Field {
 
             if (parameters.searchable !== undefined) {
                 this[SEARCHABLE] = parameters.searchable;
+            }
+
+            if (parameters.group !== undefined) {
+                this[GROUP] = parameters.group;
             }
 
             for (let hint of Object.getOwnPropertySymbols(parameters)) {
@@ -117,7 +122,7 @@ export class Field {
      * @param {Field} field - The field to claim
      * @param {FieldRole} role - The role that the field will fulfill
      *
-     * @throws {FieldOwnershipError} - Thrown if the field already belong to
+     * @throws {FieldOwnershipError} - Thrown if the field already belongs to
      *      another field.
      */
     claim(field, role) {
@@ -126,6 +131,34 @@ export class Field {
         }
         field[OWNER] = this;
         field[ROLE] = this;
+    }
+
+    // === Field groups =======================================================
+
+    /**
+     * The group that the field belongs to.
+     *
+     * Returns null if the field belongs to no group.
+     *
+     * Be aware that this property won't return a reference to the actual
+     * {@link Group} until the field's schema has been initialized. Until then,
+     * the name of the group will be returned instead.
+     */
+    get group() {
+        return this[GROUP] || null;
+    }
+
+    /**
+     * Set the group of this field.
+     * @param {Group} group
+     * @throws {FieldGroupChangeError} - Thrown if the field already belongs to
+     *      another group.
+     */
+    setGroup(group) {
+        if (typeof(this[GROUP]) == "object") {
+            throw new FieldGroupChangeError(this, group);
+        }
+        this[GROUP] = group;
     }
 
     // === Copying and initializationg ========================================
@@ -150,12 +183,22 @@ export class Field {
             required: this[REQUIRED]
         };
 
+        // Group
+        if (typeof(this[GROUP]) == "object") {
+            parameters.group = this[GROUP].name;
+        }
+        else {
+            parameters.group = this[GROUP];
+        }
+
+        // Hints
         for (let key of Object.getOwnPropertySymbols(this)) {
             if (isHint(key)) {
                 parameters[key] = this[key];
             }
         }
 
+        // User supplied parameters
         if (options) {
             for (let key of Object.getOwnPropertyNames(options)) {
                 parameters[key] = options[key];
@@ -453,11 +496,30 @@ export class ValueRequiredError extends ValidationError {
     }
 }
 
+/**
+ * An exception thrown when a field is given a value that it can't parse.
+ *
+ * Implementations of {@link Field.fromJSON} should throw this error if they are unable
+ * to parse a value.
+ */
 export class ParseError extends Error  {
 
     constructor(field, value) {
         super(`${value} is not a valid value for ${field}`);
         this.field = field;
         this.value = value;
+    }
+}
+
+/**
+ * An exception thrown when attempting to add a field that already belongs to a group
+ * to another group.
+ */
+export class FieldGroupChangeError extends Error {
+
+    constructor(group, field) {
+        super(`Can't assign ${field} to ${group}, it already belongs to ${field.group}`);
+        this.group = group;
+        this.field = field;
     }
 }

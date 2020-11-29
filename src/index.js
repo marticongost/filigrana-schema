@@ -12,8 +12,10 @@ export {
     ValidationError,
     ValueRequiredError,
     FieldOwnershipError,
-    ParseError
+    ParseError,
+    FieldGroupChangeError
 } from "./field";
+export { Group } from "./group";
 export { declareHint, applyHint, isHint, UnknownHintError } from "./hints";
 export { Schema } from "./schema";
 export { Text } from "./text";

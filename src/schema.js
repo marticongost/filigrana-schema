@@ -4,30 +4,87 @@ import { Reference } from './reference';
 
 const BASE = Symbol('BASE');
 const FIELDS = Symbol('FIELDS');
+const GROUPS = Symbol('GROUPS');
+const GROUPED = Symbol('GROUPED');
 
 export class Schema extends Field {
 
     constructor(parameters = null) {
-        const {base, fields, ...baseParameters} = parameters;
+        const {base, groups, fields, ...baseParameters} = parameters;
         super(baseParameters);
         this[BASE] = base;
         this[FIELDS] = [];
+        this[GROUPS] = [];
+
+        if (groups) {
+            for (let group of groups) {
+                this.addGroup(group);
+            }
+        }
+
         if (fields) {
             for (let field of fields) {
-                this.add(field);
+                this.addField(field);
             }
         }
     }
 
-    add(field) {
+    /**
+     * Iterates over the schema's field groups.
+     */
+    *groups() {
+        yield *this[GROUPS];
+    }
+
+    /**
+     * Indicates whether the fields contained within the schema are arranged into
+     * groups.
+     */
+    get grouped() {
+        return this[GROUPED];
+    }
+
+    /**
+     * Defines a group of fields on the schema.
+     *
+     * @param {Group} group - The group to add to the schema.
+     * @return {Group} The passed in group.
+     */
+    addGroup(group) {
+
+        if (!group.name) {
+            throw new AnonymousGroupError(group, this);
+        }
+
+        if (group.schema) {
+            throw new GroupOwnershipError(this, group);
+        }
+
+        this[GROUPS].push(group);
+        this[GROUPS][group.name] = group;
+        return group;
+    }
+
+    addField(field) {
 
         if (!field.name) {
-            throw new AnonymousMemberError(field, this);
+            throw new AnonymousFieldError(field, this);
         }
 
         this.claim(field, FieldRole.SCHEMA_FIELD);
         this[FIELDS][field.name] = field;
         this[FIELDS].push(field);
+
+        // Attach the field to its group
+        if (field.group) {
+            const group = this[GROUPS][field.group];
+            if (!group) {
+                throw new GroupNotFoundError(this, field.group);
+            }
+            this[GROUPED] = true;
+            group.addField(field);
+        }
+
         return field;
     }
 
@@ -41,6 +98,9 @@ export class Schema extends Field {
         } = (options || {});
 
         const parameters = super.getCopyParameters(baseOptions);
+
+        // Clone groups
+        parameters.groups = this[GROUPS].map(group => group.copy());
 
         function produceField(field) {
 
@@ -72,7 +132,7 @@ export class Schema extends Field {
                 if (typeof(spec) == 'string') {
                     const sourceField = this[FIELDS][spec];
                     if (!sourceField) {
-                        throw new MemberNotFoundError(this, spec);
+                        throw new FieldNotFoundError(this, spec);
                     }
                     field = produceField(sourceField);
                 }
@@ -152,6 +212,7 @@ export class Schema extends Field {
      * If no such field exists the method returns null.
      *
      * @param {String} name - The name of the field to obtain.
+     * @returns {Field}
      */
     getField(name) {
         let schema = this;
@@ -164,9 +225,43 @@ export class Schema extends Field {
         }
         return null;
     }
+
+    /** Obtains one of the field groups of the schema, given its name.
+     *
+     * If no such group exists the method returns null.
+     *
+     * @param {String} name - The name of the group to obtain.
+     * @return {Object}
+     */
+    getGroup(name) {
+        let schema = this;
+        while (schema) {
+            const group = schema[GROUPS][name];
+            if (group) {
+                return group;
+            }
+            schema = schema[BASE];
+        }
+        return null;
+    }
 }
 
-class AnonymousMemberError extends Error {
+/**
+ * An exception thrown when attempting to add a group without a name to a schema.
+ */
+class AnonymousGroupError extends Error {
+
+    constructor(group, schema) {
+        super(`Can't add anonymous group ${group} to ${schema}`);
+        this.group = group;
+        this.schema = schema;
+    }
+}
+
+/**
+ * An exception thrown when attempting to add a field without a name to a schema.
+ */
+class AnonymousFieldError extends Error {
 
     constructor(field, schema) {
         super(`Can't add anonymous field ${field} to ${schema}`);
@@ -175,11 +270,44 @@ class AnonymousMemberError extends Error {
     }
 }
 
-class MemberNotFoundError extends Error {
+/**
+ * An exception thrown when attempting to retrieve an schema group using an invalid
+ * name.
+ */
+class GroupNotFoundError extends Error {
+
+    constructor(schema, groupName) {
+        super(`${schema} doesn't contain a group named ${groupName}`);
+        this.schema = schema;
+        this.groupName = groupName;
+    }
+}
+
+/**
+ * An exception thrown when attempting to retrieve an schema member using an invalid
+ * name.
+ */
+class FieldNotFoundError extends Error {
 
     constructor(schema, fieldName) {
         super(`${schema} doesn't contain a member named ${fieldName}`);
         this.schema = schema;
         this.fieldName = fieldName;
+    }
+}
+
+/**
+ * An exception thrown when attempting to add a group that already belongs to a schema
+ * to another schema.
+ */
+export class GroupOwnershipError extends Error {
+
+    constructor(claimer, group) {
+        super(
+            `${claimer} can't add group ${group}, since the group `
+          + `already belongs to ${group.owner}`
+        );
+        this.claimer = claimer;
+        this.group = group;
     }
 }
