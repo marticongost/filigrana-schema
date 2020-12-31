@@ -195,7 +195,8 @@ export class Field {
             description: this[DESCRIPTION],
             type: this[TYPE],
             required: this[REQUIRED],
-            dataPath: this[DATA_PATH]
+            searchable: this[SEARCHABLE],
+            dataPath: this[DATA_PATH],
         };
 
         // Group
