@@ -268,6 +268,18 @@ export class Field {
     }
 
     /**
+     * Obtains a serializable representation of one of the field's values.
+     *
+     * The returned value should be a string or an integer.
+     */
+    getValueId(value) {
+        if (value === null || value === undefined) {
+            return "";
+        }
+        return value.toString();
+    }
+
+    /**
      * Obtains a descriptive representation of one of the field's values.
      *
      * The returned value should be a string suitable for inclusion in
