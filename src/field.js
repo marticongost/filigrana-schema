@@ -7,6 +7,7 @@ const OWNER = Symbol('OWNER');
 const ROLE = Symbol('ROLE');
 const GROUP = Symbol('GROUP');
 const LABEL = Symbol('LABEL');
+const NULL_LABEL = Symbol('NULL_LABEL');
 const DESCRIPTION = Symbol('DESCRIPTION');
 const TYPE = Symbol('TYPE');
 const REQUIRED = Symbol('REQUIRED');
@@ -26,6 +27,10 @@ export class Field {
 
             if (parameters.label !== undefined) {
                 this[LABEL] = parameters.label;
+            }
+
+            if (parameters.nullLabel !== undefined) {
+                this[NULL_LABEL] = parameters.nullLabel;
             }
 
             if (parameters.description !== undefined) {
@@ -186,6 +191,7 @@ export class Field {
         const parameters = {
             name: this[NAME],
             label: this[LABEL],
+            nullLabel: this[NULL_LABEL],
             description: this[DESCRIPTION],
             type: this[TYPE],
             required: this[REQUIRED],
@@ -245,6 +251,16 @@ export class Field {
     }
 
     /**
+     * User readable label to be displayed when the field is given a null / undefined
+     * value.
+     *
+     * @type {string}
+     */
+    get nullLabel() {
+        return this[NULL_LABEL] || "";
+    }
+
+    /**
      * A detailed description of the field's contents and expected usage.
      */
     get description() {
@@ -259,7 +275,7 @@ export class Field {
      */
     getValueLabel(value, options = null) {
         if (value === null || value === undefined) {
-            return '';
+            return this.nullLabel;
         }
         return value.toString();
     }
