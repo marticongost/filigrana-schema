@@ -5,7 +5,7 @@ const FORMAT = Symbol('format');
 
 export const NUMBER_FORMATTER = new Intl.NumberFormat(navigator.language, {});
 
-class Number extends Field {
+export class Number extends Field {
 
     constructor(parameters = null) {
         const {format, ...baseParameters} = parameters;
