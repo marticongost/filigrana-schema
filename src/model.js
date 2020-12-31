@@ -152,7 +152,7 @@ export class Model {
 
     copy(values = null) {
         const mergedValues = {};
-        for (let field of this[SCHEMA].fields) {
+        for (let field of this.constructor[SCHEMA].fields()) {
             const key = field.name;
             if (values && field.name in values) {
                 mergedValues[key] = values[key];
