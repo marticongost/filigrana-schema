@@ -42,3 +42,12 @@ export class UnknownHintError extends Error {
         this.value = value;
     }
 }
+
+export class UndefinedHintError extends Error {
+
+    constructor(field, hint) {
+        super(`${field} doesn't define a value for the ${hint.toString()} hint.`);
+        this.field = field;
+        this.hint;
+    }
+}

@@ -1,6 +1,6 @@
 
 import Enum from '@filigrana/enum';
-import { isHint, applyHint } from './hints';
+import { isHint, applyHint, UndefinedHintError } from './hints';
 
 const NAME = Symbol('NAME');
 const OWNER = Symbol('OWNER');
@@ -474,6 +474,23 @@ export class Field {
             this[TYPE_NAMES] = nameList.join(' ');
         }
         return this[TYPE_NAMES];
+    }
+
+    // === Hints ==============================================================
+
+    /**
+     * Obtains the value of the given hint for the field.
+     *
+     * @param {Symbol} hint
+     * @returns The value of the given hint.
+     * @throws {UndefinedHintError} Thrown if the hint is undefined.
+     */
+    requireHint(hint) {
+        const value = this[hint];
+        if (value === undefined) {
+            throw new UndefinedHintError(this, hint);
+        }
+        return value;
     }
 }
 
