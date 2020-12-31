@@ -161,7 +161,20 @@ export class Model {
                 mergedValues[key] = this.getValue(key);
             }
         }
-        return new this(mergedValues);
+        return new this.constructor(mergedValues);
+    }
+
+    /**
+     * Indicates whether the object contains one or more non blank values for any of
+     * its fields.
+     */
+    isBlank() {
+        for (let field of this.constructor[SCHEMA].fields()) {
+            if (!field.valueIsBlank(this.getValue(field.name))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     static fromJSON(record) {
