@@ -174,7 +174,7 @@ export class Field {
         this[GROUP] = group;
     }
 
-    // === Copying and initializationg ========================================
+    // === Copying and initialization =========================================
 
     /**
      * Creates a copy of the field.
