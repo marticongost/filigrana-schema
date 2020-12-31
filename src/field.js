@@ -332,6 +332,23 @@ export class Field {
     }
 
     /**
+     * Determines whether two values of the field should be considered as being equal.
+     *
+     * By default the method tests full equality (ie. applies the === operator). Field
+     * types should override this method if they require a different kind of equality
+     * comparison for their values.
+     *
+     * @param {*} value - The first value for the comparison
+     * @param {*} otherValue - The second value for the comparison
+     *
+     * @returns A boolean indicating whether the values are equal (true) or different
+     *  (false).
+     */
+    valueIsEqual(value, otherValue) {
+        return value === otherValue;
+    }
+
+    /**
      * The value returned by the field when not given a explicit value.
      *
      * See {@link produceDefaultValue} for the semantics of the property.
