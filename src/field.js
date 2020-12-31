@@ -381,6 +381,22 @@ export class Field {
     }
 
     /**
+     * Obtain the possible values for the field.
+     *
+     * @param {*} instance - The instance to obtain the possible values of the field
+     *  for. This might be useful in order to limit the set of available values based
+     *  depending on certain properties of the target object that will eventually define
+     *  the value for the field. This parameter is optional; implementations should NOT
+     *  assume it will always be given.
+     *
+     * @returns A list of valid values for the field, or null if the field can't be
+     *  constrained to a finite set of values.
+     */
+    getPossibleValues(instance = null) {
+        return null;
+    }
+
+    /**
      * Normalizes a value for the field.
      *
      * By default the method returns the value as is, but field type

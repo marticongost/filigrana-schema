@@ -40,6 +40,10 @@ export class Enum extends Field {
         return super.getValueLabel(value, options);
     }
 
+    getPossibleValues(instance = null) {
+        return Array.from(this[ENUM].options());
+    }
+
     fromJSON(value) {
         return this[ENUM].getEntryByValue(value);
     }
