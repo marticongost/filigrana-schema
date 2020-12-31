@@ -127,6 +127,29 @@ export class Model {
         this[PROPERTIES][key] = field.normalize(value);
     }
 
+    static equal(a, b) {
+
+        if (!a) {
+            return !b;
+        }
+
+        if (!b) {
+            return !a;
+        }
+
+        if (a.constructor !== b.constructor) {
+            return false;
+        }
+
+        for (let field of a.constructor.schema.fields()) {
+            if (a.getValue(field.name) != b.getValue(field.name)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     copy(values = null) {
         const mergedValues = {};
         for (let field of this[SCHEMA].fields) {
