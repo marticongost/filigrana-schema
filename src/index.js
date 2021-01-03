@@ -23,6 +23,7 @@ export { Boolean } from "./boolean";
 export { Number, Integer, Float, NUMBER_FORMATTER } from "./numbers";
 export { Date, DateTime } from "./dates";
 export { Enum } from "./enum";
+export { FieldReference } from "./fieldreference";
 export { Reference } from "./reference";
 export { Collection } from "./collection";
 export { Mapping } from "./mapping";
