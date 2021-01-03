@@ -2,7 +2,7 @@ import { Field, FieldRole, ValidationError } from './field.js';
 import { getParameter } from './utils.js';
 
 const ITEMS = Symbol('ITEMS');
-const COLLECTION_CLASS = Symbol('COLLECTION_TYPE');
+const COLLECTION_CLASS = Symbol('COLLECTION_CLASS');
 const MIN_ITEMS = Symbol('MIN_ITEMS');
 const MAX_ITEMS = Symbol('MAX_ITEMS');
 
@@ -12,7 +12,7 @@ export class Collection extends Field {
     constructor(parameters = null) {
         super(parameters);
         this[ITEMS] = getParameter(parameters, 'items');
-        this[COLLECTION_TYPE] = (
+        this[COLLECTION_CLASS] = (
             getParameter(parameters, 'collectionClass', Array)
         );
         this[MIN_ITEMS] = getParameter(parameters, 'minItems');
