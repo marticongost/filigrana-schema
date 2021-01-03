@@ -10,6 +10,7 @@ const LABEL = Symbol('LABEL');
 const NULL_LABEL = Symbol('NULL_LABEL');
 const DESCRIPTION = Symbol('DESCRIPTION');
 const TYPE = Symbol('TYPE');
+const CHOICES = Symbol("CHOICES");
 const REQUIRED = Symbol('REQUIRED');
 const DEFAULT_VALUE = Symbol('DEFAULT_VALUE');
 const DATA_PATH = Symbol('DATA_PATH');
@@ -39,6 +40,10 @@ export class Field {
 
             if (parameters.type !== undefined) {
                 this[TYPE] = parameters.type;
+            }
+
+            if (parameters.choices !== undefined) {
+                this[CHOICES] = parameters.choices;
             }
 
             if (parameters.required !== undefined) {
@@ -194,6 +199,7 @@ export class Field {
             nullLabel: this[NULL_LABEL],
             description: this[DESCRIPTION],
             type: this[TYPE],
+            choices: this[CHOICES],
             required: this[REQUIRED],
             searchable: this[SEARCHABLE],
             dataPath: this[DATA_PATH],
@@ -252,6 +258,21 @@ export class Field {
     }
 
     /**
+     * User readable label for the field, qualified with the label for the group it
+     * belongs to (if any).
+     *
+     * @type {string}
+     */
+    getQualifiedLabel(options = null) {
+        let label = this[LABEL];
+        if (label && this[GROUP]) {
+            const separator = options && options.separator || ": ";
+            label = `${this[GROUP].label}${separator} ${label}`;
+        }
+        return label;
+    }
+
+    /**
      * User readable label to be displayed when the field is given a null / undefined
      * value.
      *
@@ -302,6 +323,15 @@ export class Field {
      */
     get type() {
         return this[TYPE];
+    }
+
+    /**
+     * The closed set of values that the field is allowed to have.
+     *
+     * @type {Array|Set}
+     */
+    get choices() {
+        return this[CHOICES];
     }
 
     /**
@@ -384,6 +414,11 @@ export class Field {
     /**
      * Obtain the possible values for the field.
      *
+     * Field types can override this method to reflect the values appropiate for their
+     * type; for example, an integer field could override the method to generate the
+     * series of values between its "min" and "max" constraints. Nonetheless, if they do
+     * so they have to honor the {@link choices} property.
+     *
      * @param {*} instance - The instance to obtain the possible values of the field
      *  for. This might be useful in order to limit the set of available values based
      *  depending on certain properties of the target object that will eventually define
@@ -394,7 +429,7 @@ export class Field {
      *  constrained to a finite set of values.
      */
     getPossibleValues(instance = null) {
-        return null;
+        return this[CHOICES];
     }
 
     /**
